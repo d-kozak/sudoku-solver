@@ -1,9 +1,15 @@
 package io.dkozak.sudoku.solver.model
 
-
+/**
+ * Represents one Sudoku puzzle
+ */
 data class SudokuPuzzle(
+        /**
+         * Individual rows of the puzzle
+         */
         val rows: Array<IntArray> = Array(DEFAULT_SIZE) { IntArray(DEFAULT_SIZE) }
 ) {
+
 
     val puzzleSize: Int = rows.size
 
@@ -14,6 +20,27 @@ data class SudokuPuzzle(
     init {
         val errors = validate()
         if (errors.isNotEmpty()) throw IllegalStateException(errors.toString())
+    }
+
+    /**
+     * Returns a list of candidate numbers for a specific cell
+     */
+    fun numbersFor(i: Int, j: Int): Set<Int> {
+        val possibleNumbers = (1..puzzleSize).toMutableSet()
+        for (cell in rows[i])
+            if (cell != 0) possibleNumbers.remove(cell)
+        for (row in rows) {
+            if (row[j] != 0) possibleNumbers.remove(row[j])
+        }
+
+        val colBottom = (i / 3) * 3
+        val rowBottom = (j / 3) * 3
+        for (x in colBottom until colBottom + 3) {
+            for (y in rowBottom until rowBottom + 3)
+                if (rows[x][y] != 0) possibleNumbers.remove(rows[x][y])
+        }
+
+        return possibleNumbers
     }
 
 
