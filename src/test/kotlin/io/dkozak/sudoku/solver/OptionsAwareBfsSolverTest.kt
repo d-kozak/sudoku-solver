@@ -6,12 +6,12 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 
 
-class OptionsAwareBacktrackingSolverTest {
+class OptionsAwareBfsSolverTest {
 
     @Test
     fun `load first new`() {
         val puzzle = loadPuzzle("src/test/resources/puzzles/first.sudoku", ::OptionsAwareSudokuPuzzle)
-        val solution = OptionsAwareBacktrackingSolver(puzzle).solve()
+        val solution = OptionsAwareBfsSolver(puzzle).solve()
         solution?.validateOrFail(false) ?: fail("solution should be found")
         println(solution)
     }
@@ -19,7 +19,15 @@ class OptionsAwareBacktrackingSolverTest {
     @Test
     fun `load second new`() {
         val puzzle = loadPuzzle("src/test/resources/puzzles/second.sudoku", ::OptionsAwareSudokuPuzzle)
-        val solution = OptionsAwareBacktrackingSolver(puzzle).solve()
+        val solution = OptionsAwareBfsSolver(puzzle).solve()
+        solution?.validateOrFail(false) ?: fail("solution should be found")
+        println(solution)
+    }
+
+    @Test
+    fun `solve empty`() {
+        val puzzle = loadPuzzle("src/test/resources/puzzles/empty.sudoku", ::OptionsAwareSudokuPuzzle)
+        val solution = OptionsAwareBfsSolver(puzzle).solve()
         solution?.validateOrFail(false) ?: fail("solution should be found")
         println(solution)
     }
