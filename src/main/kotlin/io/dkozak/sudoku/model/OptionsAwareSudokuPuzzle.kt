@@ -80,7 +80,6 @@ class OptionsAwareSudokuPuzzle(override val content: Array<Array<OptionsAwareSud
     }
 
     override fun set(row: Int, col: Int, value: Int) {
-        logger.info { "Settings [$row][$col] to $value" }
         for (cell in row(row))
             cell.content.clear(value - 1)
         for (cell in col(col))
@@ -88,8 +87,6 @@ class OptionsAwareSudokuPuzzle(override val content: Array<Array<OptionsAwareSud
         for (cell in region(row, col))
             cell.content.clear(value - 1)
         content[row][col].value = value
-        validateOrFail(true)
-        logger.info { "Success" }
     }
 
     fun copy(): OptionsAwareSudokuPuzzle {
@@ -99,5 +96,10 @@ class OptionsAwareSudokuPuzzle(override val content: Array<Array<OptionsAwareSud
                 res[i, j] = cell.value
         }
         return res
+    }
+
+
+    override fun toString(): String {
+        return "OptionsAwareSudokuPuzzle\n ${toPrintableString()}"
     }
 }

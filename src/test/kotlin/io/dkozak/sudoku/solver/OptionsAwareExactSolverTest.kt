@@ -13,8 +13,9 @@ class OptionsAwareExactSolverTest {
     @Test
     fun `load first new`() {
         val puzzle = loadPuzzle("src/test/resources/puzzles/first.sudoku", ::OptionsAwareSudokuPuzzle)
-        OptionsAwareExactSolver(puzzle).solve()
-                ?.validateOrFail(false) ?: fail("solution should be found")
+        val solution = OptionsAwareExactSolver(puzzle).solve()
+        solution?.validateOrFail(false) ?: fail("solution should be found")
+        println(solution)
     }
 
     @Test
@@ -22,6 +23,5 @@ class OptionsAwareExactSolverTest {
         // the exact solver cannot handle "guessing", so there should be no solution
         val puzzle = loadPuzzle("src/test/resources/puzzles/second.sudoku", ::OptionsAwareSudokuPuzzle)
         assertThat(OptionsAwareExactSolver(puzzle).solve()).isNull()
-
     }
 }

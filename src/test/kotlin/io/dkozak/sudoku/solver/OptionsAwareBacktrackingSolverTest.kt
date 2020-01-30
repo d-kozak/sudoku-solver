@@ -11,15 +11,16 @@ class OptionsAwareBacktrackingSolverTest {
     @Test
     fun `load first new`() {
         val puzzle = loadPuzzle("src/test/resources/puzzles/first.sudoku", ::OptionsAwareSudokuPuzzle)
-        OptionsAwareBacktrackingSolver(puzzle).solve()
-                ?.validateOrFail(false) ?: fail("solution should be found")
-
+        val solution = OptionsAwareBacktrackingSolver(puzzle).solve()
+        solution?.validateOrFail(false) ?: fail("solution should be found")
+        println(solution)
     }
 
     @Test
     fun `load second new`() {
         val puzzle = loadPuzzle("src/test/resources/puzzles/second.sudoku", ::OptionsAwareSudokuPuzzle)
-        OptionsAwareBacktrackingSolver(puzzle).solve()
-                ?.validateOrFail(false) ?: fail("solution should be found")
+        val solution = OptionsAwareBacktrackingSolver(puzzle).solve()
+        solution?.validateOrFail(false) ?: fail("solution should be found")
+        println(solution)
     }
 }
