@@ -4,15 +4,15 @@ import io.dkozak.sudoku.solver.model.SudokuPuzzle
 import java.io.File
 
 
-fun loadPuzzle(path: String): SudokuPuzzle {
+fun <PuzzleType : SudokuPuzzle<*>> loadPuzzle(path: String, puzzleFactory: (Int) -> PuzzleType): PuzzleType {
     val lines = File(path).readLines()
     val puzzleSize = lines.size
-    val content = Array(puzzleSize) { IntArray(puzzleSize) }
+    val puzzle = puzzleFactory(puzzleSize)
     for ((i, line) in lines.withIndex()) {
         for ((j, cell) in line.withIndex()) {
-            content[i][j] = if (cell != ' ') cell - '0' else 0
+            if (cell != ' ') puzzle[i, j] = cell - '0'
         }
     }
-    return SudokuPuzzle(content)
+    return puzzle
 }
 

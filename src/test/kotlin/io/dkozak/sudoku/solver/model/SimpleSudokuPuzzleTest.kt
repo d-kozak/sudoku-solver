@@ -7,19 +7,18 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 
-class SudokuPuzzleTest {
+class SimpleSudokuPuzzleTest {
     @Nested
     inner class ToStringTest {
 
         @Test
         fun simple() {
-            val puzzle = loadPuzzle("src/test/resources/puzzles/first.sudoku")
-            assertThat(puzzle.toString())
-                    .isEqualTo("""Sudoku Puzzle:
-------------------------------
+            val puzzle = loadPuzzle("src/test/resources/puzzles/first.sudoku", ::SimpleSudokuPuzzle)
+            assertThat(puzzle.toPrintableString())
+                    .isEqualTo("""------------------------------
 |    1  3 | 8       | 4     5 |
 |    2  4 | 6     5 |         |
-|    8  7 |         |    9  3 |
+|    8  7 |         | 9  3    |
 ------------------------------
 | 4  9    | 3     6 |         |
 |       1 |         | 5       |

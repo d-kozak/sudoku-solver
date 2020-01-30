@@ -1,85 +1,168 @@
 package io.dkozak.sudoku.solver.model
 
+interface SudokuCell {
+    /**
+     * value of the cell, -1 for empty cell
+     */
+    var value: Int
+    /**
+     * empty cell check, just for convenience (not to have to compare with -1)
+     */
+    val isEmpty: Boolean
+
+    /**
+     * clears the cell
+     */
+    fun clear()
+}
+
 /**
- * Represents one Sudoku puzzle
+ * Representation of a sudoku puzzle
  */
-data class SudokuPuzzle(
-        /**
-         * Individual rows of the puzzle
-         */
-        val rows: Array<IntArray> = Array(DEFAULT_SIZE) { IntArray(DEFAULT_SIZE) }
-) {
+interface SudokuPuzzle<CellType : SudokuCell> {
+
+    /**
+     * size of the puzzle
+     */
+    val size: Int
+
+    /**
+     * size of one region - should be sqrt of size
+     */
+    val regionSize: Int
+
+    /**
+     * the actual content of the puzzle
+     */
+    val content: Array<Array<CellType>>
+
+    /**
+     * get value at given coordinates
+     */
+    operator fun get(row: Int, col: Int): CellType = content[row][col]
+
+    /**
+     * set value at given coordinates
+     */
+    operator fun set(row: Int, col: Int, value: Int)
 
 
-    val puzzleSize: Int = rows.size
+    /**
+     * all cells from the puzzle
+     */
+    fun allCells() = allCellsIndexed().map { it.third }
 
-    companion object {
-        const val DEFAULT_SIZE = 9
+    /**
+     * all cells in the puzzle with their position
+     */
+    fun allCellsIndexed(): Sequence<Triple<Int, Int, CellType>> = sequence {
+        for (row in 0 until size)
+            for (col in 0 until size)
+                yield(Triple(row, col, this@SudokuPuzzle[row, col]))
+
     }
 
-    init {
-        val errors = validate()
-        if (errors.isNotEmpty()) throw IllegalStateException(errors.toString())
+
+    /**
+     * topleft corner cells from all regions
+     */
+    fun allRegions(): Sequence<Pair<Int, Int>> = sequence {
+        for (row in 0 until size step regionSize) {
+            for (col in 0 until size step regionSize) {
+                yield(row to col)
+            }
+        }
     }
+
+    /**
+     * all cells at given row
+     */
+    fun row(row: Int) = rowIndexed(row).map { it.third }
+
+
+    /**
+     * all cells at given row with their position
+     */
+    fun rowIndexed(row: Int): Sequence<Triple<Int, Int, CellType>> = sequence {
+        for (col in 0 until size)
+            yield(Triple(row, col, this@SudokuPuzzle[row, col]))
+    }
+
+    fun col(col: Int) = colIndexed(col).map { it.third }
+
+    /**
+     * all cells at given column with their position
+     */
+    fun colIndexed(col: Int): Sequence<Triple<Int, Int, CellType>> = sequence {
+        for (row in 0 until size)
+            yield(Triple(row, col, this@SudokuPuzzle[row, col]))
+    }
+
+    fun region(row: Int, col: Int) = regionIndexed(row, col).map { it.third }
+
+    /**
+     * all cells at given region with their position
+     */
+    fun regionIndexed(row: Int, col: Int): Sequence<Triple<Int, Int, CellType>> = sequence {
+        val startRow = (row / regionSize) * regionSize
+        val startCol = (col / regionSize) * regionSize
+        for (i in startRow until startRow + regionSize)
+            for (j in startCol until startCol + regionSize)
+                yield(Triple(i, j, this@SudokuPuzzle[i, j]))
+    }
+
+    /**
+     * @param allowEmptyCells whether empty cells are allowed
+     * @true if the puzzle is valid, that is all constraints are satisfied
+     */
+    fun isValid(allowEmptyCells: Boolean): Boolean = validate(allowEmptyCells).isEmpty()
+
+    /**
+     * @return list of found errors
+     */
+    fun validate(allowEmptyCells: Boolean): List<String> = SudokuValidator(this, allowEmptyCells).validate()
+
 
     /**
      * Returns a list of candidate numbers for a specific cell
      */
     fun numbersFor(i: Int, j: Int): Set<Int> {
-        val possibleNumbers = (1..puzzleSize).toMutableSet()
-        for (cell in rows[i])
-            if (cell != 0) possibleNumbers.remove(cell)
-        for (row in rows) {
-            if (row[j] != 0) possibleNumbers.remove(row[j])
+        val possibleNumbers = (1..size).toMutableSet()
+        for (cell in row(i))
+            if (!cell.isEmpty) possibleNumbers.remove(cell.value)
+        for (cell in col(j)) {
+            if (!cell.isEmpty) possibleNumbers.remove(cell.value)
         }
 
-        val colBottom = (i / 3) * 3
-        val rowBottom = (j / 3) * 3
-        for (x in colBottom until colBottom + 3) {
-            for (y in rowBottom until rowBottom + 3)
-                if (rows[x][y] != 0) possibleNumbers.remove(rows[x][y])
+        for (cell in region(i, j)) {
+            if (!cell.isEmpty) possibleNumbers.remove(cell.value)
         }
-
         return possibleNumbers
     }
 
-
-    fun isValid(): Boolean = validate().isEmpty()
-
-    fun validate(): List<String> {
-        val errors = mutableListOf<String>()
-        for ((i, row) in rows.withIndex()) {
-            if (row.size != puzzleSize) errors.add("The size of ${i}th row is not $puzzleSize ")
-            for ((j, num) in row.withIndex()) {
-                if (num !in 0..9) errors.add("Cell at [$i][$j] contains number $num, which is not from 1..9")
-            }
-        }
-        return errors
-    }
-
-    override fun toString(): String = buildString {
-        appendln("Sudoku Puzzle:")
-        for ((i, row) in rows.withIndex()) {
+    fun toPrintableString(): String = buildString {
+        for ((i, row) in content.withIndex()) {
             if (i % 3 == 0) {
-                repeat(puzzleSize + puzzleSize / 3 - 2) {
+                repeat(size + regionSize - 2) {
                     append("---")
                 }
                 appendln()
             }
-            for ((j, num) in row.withIndex()) {
+            for ((j, cell) in row.withIndex()) {
                 if (j % 3 == 0) append("|")
                 append(' ')
-                append(if (num != 0) num else ' ')
+                append(cell)
                 append(' ')
 
             }
             appendln("|")
         }
-        repeat(puzzleSize + puzzleSize / 3 - 2) {
+        repeat(size + regionSize - 2) {
             append("---")
         }
         appendln()
     }
 
-
 }
+
+

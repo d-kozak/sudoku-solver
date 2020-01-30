@@ -2,6 +2,7 @@ package io.dkozak.sudoku.solver.io
 
 import assertk.assertThat
 import assertk.assertions.isTrue
+import io.dkozak.sudoku.solver.model.SimpleSudokuPuzzle
 import io.dkozak.sudoku.solver.model.loadSudokuRem
 import io.dkozak.sudoku.solver.model.solve
 import org.junit.jupiter.api.Test
@@ -9,8 +10,8 @@ import org.junit.jupiter.api.Test
 class LoaderTest {
 
     fun checkValidity(path: String) {
-        val puzzle = loadPuzzle(path)
-        assertThat(puzzle.isValid())
+        val puzzle = loadPuzzle(path, ::SimpleSudokuPuzzle)
+        assertThat(puzzle.isValid(true))
                 .isTrue()
     }
 

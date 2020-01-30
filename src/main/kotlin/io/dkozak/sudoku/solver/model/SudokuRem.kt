@@ -5,14 +5,10 @@ import java.io.File
 import java.util.*
 import kotlin.math.sqrt
 
-private fun SudokuRem.toSudokuPuzzle(): SudokuPuzzle {
-    val rows = Array(size) { IntArray(size) }
-
-    forEachCellIndexed { i, j, cell ->
-        rows[i][j] = cell.finalValue + 1
-    }
-
-    return SudokuPuzzle(rows)
+private fun SudokuRem.toSudokuPuzzle(): SimpleSudokuPuzzle {
+    val puzzle = SimpleSudokuPuzzle(this.size)
+    // todo finish
+    return puzzle
 }
 
 fun loadSudokuRem(path: String): SudokuRem {
@@ -32,7 +28,7 @@ fun solve(puzzle: SudokuRem): SudokuRem {
     val queue: Queue<Triple<Int, Int, Int>> = LinkedList()
     val numSlots = Array(puzzle.size) { -1 to -1 }
 
-    fun processCell(row: Int, col: Int, cell: SudokuCell) {
+    fun processCell(row: Int, col: Int, cell: SudokuCellRem) {
         if (cell.finalValue != -1) return
         val options = cell.options
         if (options.size == 1) {
@@ -96,18 +92,18 @@ fun solve(puzzle: SudokuRem): SudokuRem {
 }
 
 
-data class SudokuCell(val content: BitSet, var finalValue: Int = -1) {
+data class SudokuCellRem(val content: BitSet, var finalValue: Int = -1) {
     constructor(value: Int, size: Int) : this(BitSet(size).also { it.set(value) }, size)
 
     val size: Int = content.size()
 
     companion object {
-        fun empty(size: Int): SudokuCell {
+        fun empty(size: Int): SudokuCellRem {
             val bitSet = BitSet()
             for (i in 0 until size) {
                 bitSet.set(i)
             }
-            return SudokuCell(bitSet)
+            return SudokuCellRem(bitSet)
         }
     }
 
@@ -141,9 +137,9 @@ data class SudokuCell(val content: BitSet, var finalValue: Int = -1) {
 
 private val logger = KotlinLogging.logger { }
 
-class SudokuRem(val content: Array<Array<SudokuCell>>) {
+class SudokuRem(val content: Array<Array<SudokuCellRem>>) {
 
-    constructor(size: Int) : this(Array(size) { Array(size) { SudokuCell.empty(size) } })
+    constructor(size: Int) : this(Array(size) { Array(size) { SudokuCellRem.empty(size) } })
 
     val size = content.size
 
@@ -158,16 +154,16 @@ class SudokuRem(val content: Array<Array<SudokuCell>>) {
     }
 
     fun validate(allowEmptyCell: Boolean) {
-        val errors = SudokuValidator(this, allowEmptyCell).validate()
-        if (errors.isNotEmpty()) throw IllegalStateException(this.toSudokuPuzzle().toString() + "\n" + errors.joinToString("\n"))
+//        val errors = SudokuValidator(this, allowEmptyCell).validate()
+//        if (errors.isNotEmpty()) throw IllegalStateException(this.toSudokuPuzzle().toString() + "\n" + errors.joinToString("\n"))
     }
 
 
-    fun forEachCell(block: (SudokuCell) -> Unit) {
+    fun forEachCell(block: (SudokuCellRem) -> Unit) {
         forEachCellIndexed { _, _, sudokuCell -> block(sudokuCell) }
     }
 
-    fun forEachCellIndexed(block: (Int, Int, SudokuCell) -> Unit) {
+    fun forEachCellIndexed(block: (Int, Int, SudokuCellRem) -> Unit) {
         for (row in 0 until size) {
             for (col in 0 until size) {
                 block(row, col, content[row][col])
@@ -186,31 +182,31 @@ class SudokuRem(val content: Array<Array<SudokuCell>>) {
         validate(true)
     }
 
-    fun forRow(row: Int, block: (SudokuCell) -> Unit) {
+    fun forRow(row: Int, block: (SudokuCellRem) -> Unit) {
         forRowIndexed(row) { _, _, cell -> block(cell) }
     }
 
-    fun forCol(col: Int, block: (SudokuCell) -> Unit) {
+    fun forCol(col: Int, block: (SudokuCellRem) -> Unit) {
         forColIndexed(col) { _, _, cell -> block(cell) }
     }
 
-    fun forRegion(row: Int, col: Int, block: (SudokuCell) -> Unit) {
+    fun forRegion(row: Int, col: Int, block: (SudokuCellRem) -> Unit) {
         forRegionIndexed(row, col) { _, _, cell -> block(cell) }
     }
 
-    fun forRowIndexed(row: Int, block: (Int, Int, SudokuCell) -> Unit) {
+    fun forRowIndexed(row: Int, block: (Int, Int, SudokuCellRem) -> Unit) {
         check(row in 0 until size) { "$row out of bounds, [0,$size)" }
         for ((i, cell) in content[row].withIndex())
             block(row, i, cell)
     }
 
-    fun forColIndexed(col: Int, block: (Int, Int, SudokuCell) -> Unit) {
+    fun forColIndexed(col: Int, block: (Int, Int, SudokuCellRem) -> Unit) {
         check(col in 0 until size) { "$col out of bounds, [0,$size)" }
         for ((i, row) in content.withIndex())
             block(i, col, row[col])
     }
 
-    fun forRegionIndexed(row: Int, col: Int, block: (Int, Int, SudokuCell) -> Unit) {
+    fun forRegionIndexed(row: Int, col: Int, block: (Int, Int, SudokuCellRem) -> Unit) {
         val x = (row / regionSize) * regionSize
         val y = (col / regionSize) * regionSize
         for (i in x until x + regionSize)
@@ -218,48 +214,7 @@ class SudokuRem(val content: Array<Array<SudokuCell>>) {
                 block(i, j, content[i][j])
     }
 
-    fun isValid(): Boolean = SudokuValidator(this).isValid()
+//    fun isValid(): Boolean = SudokuValidator(this).isValid()
 
 
-}
-
-private class SudokuValidator(val puzzle: SudokuRem, val allowEmptyCell: Boolean = false) {
-    val errors = mutableListOf<String>()
-
-    fun isValid(): Boolean = validate().isEmpty()
-
-    fun validateSequence(prefix: String, callback: ((Int, Int, SudokuCell) -> Unit) -> Unit) {
-        val numLocations = mutableMapOf<Int, MutableSet<Pair<Int, Int>>>()
-        callback { i, j, cell ->
-            if (cell.finalValue == -1 && !allowEmptyCell) {
-                errors.add("$prefix: [$i][$j] is empty")
-            } else if (cell.finalValue != -1) {
-                numLocations.computeIfAbsent(cell.finalValue) { mutableSetOf() }
-                        .add(i to j)
-            }
-        }
-
-        for ((num, locations) in numLocations) {
-            if (locations.size > 1)
-                errors.add("$prefix: Number ${num + 1} is present in multiple cells $locations")
-        }
-    }
-
-
-    fun validate(): List<String> {
-        for ((i, row) in puzzle.content.withIndex()) {
-            if (row.size != puzzle.size) errors.add("Row $i does not have expected size ${puzzle.size}, it has ${row.size}")
-        }
-
-        for (i in 0 until puzzle.size) {
-            validateSequence("Row ${i + 1}") { block -> puzzle.forRowIndexed(i, block) }
-            validateSequence("Col ${i + 1}") { block -> puzzle.forColIndexed(i, block) }
-        }
-
-        for (i in 0 until puzzle.size step puzzle.regionSize)
-            for (j in 0 until puzzle.size step puzzle.regionSize)
-                validateSequence("Region [${i + 1}..${i + puzzle.regionSize}][${j + 1}..${j + puzzle.regionSize}]") { block -> puzzle.forRegionIndexed(i, j, block) }
-
-        return errors
-    }
 }
