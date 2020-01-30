@@ -91,4 +91,13 @@ class OptionsAwareSudokuPuzzle(override val content: Array<Array<OptionsAwareSud
         validateOrFail(true)
         logger.info { "Success" }
     }
+
+    fun copy(): OptionsAwareSudokuPuzzle {
+        val res = OptionsAwareSudokuPuzzle(size)
+        for ((i, j, cell) in allCellsIndexed()) {
+            if (cell.isSet)
+                res[i, j] = cell.value
+        }
+        return res
+    }
 }

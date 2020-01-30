@@ -13,7 +13,7 @@ class SimpleBacktrackingSolverTest {
     val solver = SimpleBacktrackingSolver()
 
     @Test
-    @Timeout(10)
+    @Timeout(5)
     fun simple() {
         val puzzle = loadPuzzle("src/test/resources/puzzles/first.sudoku", ::SimpleSudokuPuzzle)
         val solution = solver.solve(puzzle)

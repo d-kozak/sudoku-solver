@@ -1,4 +1,4 @@
-package io.dkozak.sudoku.solver.bitset
+package io.dkozak.sudoku.bitset
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo

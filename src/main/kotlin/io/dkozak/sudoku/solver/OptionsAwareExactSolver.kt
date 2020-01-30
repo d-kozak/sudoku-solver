@@ -2,7 +2,6 @@ package io.dkozak.sudoku.solver
 
 import io.dkozak.sudoku.model.OptionsAwareSudokuCell
 import io.dkozak.sudoku.model.OptionsAwareSudokuPuzzle
-import io.dkozak.sudoku.model.toSimpleSudokuPuzzle
 import java.util.*
 
 
@@ -10,7 +9,7 @@ class OptionsAwareExactSolver(val puzzle: OptionsAwareSudokuPuzzle) {
     val queue: Queue<Triple<Int, Int, Int>> = LinkedList()
     val numSlots = Array(puzzle.size) { -1 to -1 }
 
-    fun solve(): OptionsAwareSudokuPuzzle {
+    fun solve(): OptionsAwareSudokuPuzzle? {
         scanPuzzle()
         while (queue.isNotEmpty()) {
             while (queue.isNotEmpty()) {
@@ -21,9 +20,7 @@ class OptionsAwareExactSolver(val puzzle: OptionsAwareSudokuPuzzle) {
             scanPuzzle()
         }
 
-        puzzle.validateOrFail(false)
-        println(puzzle.toSimpleSudokuPuzzle())
-        return puzzle
+        return if (puzzle.isValid(false)) puzzle else null
     }
 
     private fun processCell(row: Int, col: Int, cell: OptionsAwareSudokuCell) {
