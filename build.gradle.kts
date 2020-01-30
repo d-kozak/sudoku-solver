@@ -39,8 +39,8 @@ dependencies {
     compile("org.apache.logging.log4j:log4j-slf4j-impl:2.9.1")
 
     testCompile("com.willowtreeapps.assertk:assertk-jvm:0.21")
-    testCompile("org.junit.jupiter:junit-jupiter-api:5.3.2")
-    testRuntime("org.junit.jupiter:junit-jupiter-engine:5.3.2")
+    testCompile("org.junit.jupiter:junit-jupiter-api:5.5.2")
+    testRuntime("org.junit.jupiter:junit-jupiter-engine:5.5.2")
 }
 
 application {

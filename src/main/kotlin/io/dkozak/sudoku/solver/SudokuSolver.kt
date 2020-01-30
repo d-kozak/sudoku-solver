@@ -1,6 +1,6 @@
 package io.dkozak.sudoku.solver
 
-import io.dkozak.sudoku.solver.model.SimpleSudokuPuzzle
+import io.dkozak.sudoku.model.SimpleSudokuPuzzle
 
 /**
  * Generic interface for a sudoku solver

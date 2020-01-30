@@ -1,4 +1,4 @@
-package io.dkozak.sudoku.solver
+package io.dkozak.sudoku
 
 fun main() {
     println("Hello")

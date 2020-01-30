@@ -1,4 +1,4 @@
-package io.dkozak.sudoku.solver.model
+package io.dkozak.sudoku.model
 
 data class SimpleSudokuCell(override var value: Int = -1) : SudokuCell {
     override val isEmpty: Boolean
@@ -33,7 +33,7 @@ data class SimpleSudokuPuzzle(
     }
 
     init {
-        validate(true)
+        validateOrFail(true)
     }
 
     override fun equals(other: Any?): Boolean {

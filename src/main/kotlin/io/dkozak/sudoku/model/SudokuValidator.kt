@@ -1,4 +1,4 @@
-package io.dkozak.sudoku.solver.model
+package io.dkozak.sudoku.model
 
 
 /**

@@ -1,4 +1,4 @@
-package io.dkozak.sudoku.solver.model
+package io.dkozak.sudoku.model
 
 interface SudokuCell {
     /**
@@ -122,6 +122,13 @@ interface SudokuPuzzle<CellType : SudokuCell> {
      */
     fun validate(allowEmptyCells: Boolean): List<String> = SudokuValidator(this, allowEmptyCells).validate()
 
+
+    fun validateOrFail(allowEmptyCells: Boolean) {
+        val errors = validate(allowEmptyCells)
+        if (errors.isNotEmpty()) {
+            throw IllegalStateException(toPrintableString() + "\n" + errors.joinToString("\n"))
+        }
+    }
 
     /**
      * Returns a list of candidate numbers for a specific cell

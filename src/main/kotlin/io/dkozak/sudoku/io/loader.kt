@@ -1,6 +1,6 @@
-package io.dkozak.sudoku.solver.io
+package io.dkozak.sudoku.io
 
-import io.dkozak.sudoku.solver.model.SudokuPuzzle
+import io.dkozak.sudoku.model.SudokuPuzzle
 import java.io.File
 
 

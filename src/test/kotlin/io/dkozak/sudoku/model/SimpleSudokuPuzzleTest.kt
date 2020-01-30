@@ -1,8 +1,8 @@
-package io.dkozak.sudoku.solver.model
+package io.dkozak.sudoku.model
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import io.dkozak.sudoku.solver.io.loadPuzzle
+import io.dkozak.sudoku.io.loadPuzzle
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
