@@ -56,40 +56,38 @@ fun solve(puzzle: SudokuRem): SudokuRem {
         }
     }
 
-    puzzle.forEachCellIndexed { row, col, cell ->
-        if (row == 0) {
-            puzzle.forColIndexed(col, ::processCell)
-            processNumSlots()
-        }
-        if (col == 0) {
-            puzzle.forRowIndexed(row, ::processCell)
-            processNumSlots()
-        }
+    fun scanPuzzle() {
+        puzzle.forEachCellIndexed { row, col, cell ->
+            if (row == 0) {
+                puzzle.forColIndexed(col, ::processCell)
+                processNumSlots()
+            }
+            if (col == 0) {
+                puzzle.forRowIndexed(row, ::processCell)
+                processNumSlots()
+            }
 
-        if (row % puzzle.regionSize == 0 && col % puzzle.regionSize == 0) {
-            puzzle.forRegionIndexed(row, col, ::processCell)
-            processNumSlots()
-        }
+            if (row % puzzle.regionSize == 0 && col % puzzle.regionSize == 0) {
+                puzzle.forRegionIndexed(row, col, ::processCell)
+                processNumSlots()
+            }
 
-        val option = cell.value
-        if (option != null) {
-            queue.add(Triple(row, col, option))
+            val option = cell.value
+            if (option != null) {
+                queue.add(Triple(row, col, option))
+            }
         }
     }
 
+    scanPuzzle()
+
     while (queue.isNotEmpty()) {
-        val (row, col, value) = queue.poll()
-        if (puzzle[row, col].finalValue != -1) continue
-        puzzle[row, col] = value
-
-        puzzle.forRowIndexed(row, ::processCell)
-        processNumSlots()
-
-        puzzle.forColIndexed(col, ::processCell)
-        processNumSlots()
-
-        puzzle.forRegionIndexed(row, col, ::processCell)
-        processNumSlots()
+        while (queue.isNotEmpty()) {
+            val (row, col, value) = queue.poll()
+            if (puzzle[row, col].finalValue != -1) continue
+            puzzle[row, col] = value
+        }
+        scanPuzzle()
     }
 
     puzzle.validate(false)
