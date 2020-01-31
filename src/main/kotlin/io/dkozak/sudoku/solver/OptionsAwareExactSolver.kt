@@ -12,7 +12,14 @@ private val logger = KotlinLogging.logger { }
  * 1) if there is a cell with only one option left, set it
  * 2) if there is only one option for a given number in a row, col or region, set it
  */
-class OptionsAwareExactSolver(override val initialPuzzle: OptionsAwareSudokuPuzzle, val printPartialSolution: Boolean = false) : SudokuSolver<OptionsAwareSudokuCell, OptionsAwareSudokuPuzzle> {
+class OptionsAwareExactSolver(override val initialPuzzle: OptionsAwareSudokuPuzzle) : SudokuSolver<OptionsAwareSudokuCell, OptionsAwareSudokuPuzzle> {
+
+    var printPartialSolution: Boolean = false
+
+    constructor(initialPuzzle: OptionsAwareSudokuPuzzle, printPartialSolution: Boolean) : this(initialPuzzle) {
+        this.printPartialSolution = printPartialSolution
+    }
+
     val queue: Queue<Triple<Int, Int, Int>> = LinkedList()
     val numSlots = Array(initialPuzzle.size) { -1 to -1 }
 
