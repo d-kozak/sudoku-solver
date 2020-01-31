@@ -1,14 +1,31 @@
 # Sudoku solver
+Sudoku solver. Complete architecture document can be found [here](./architecture.md).
 
-Sudoku solver written in Java. The plan is to have multiple techniques you can choose from 
-and to provide a comparision between them.
+## Technical description
+* Written in Kotlin 
+* Build using Gradle
 
-## Ideas
-We could apply brute force and just try all inputs, but there is quite a lot of them (upper bound 9^81).
-1. brute force v1 - enumerate all possible inputs 
-2. brute force v2 - try to fill it in from top to bottom, backtrack when sudoku rule is broken encountered 
+## Run
+You can run the app directly using gradle.
+```
+gradle run --args="path-to-puzzle [solver-to-use]"
+```
+For example
+```
+gradle run --args="src/test/resources/puzzles/second.sudoku dfs"
+```
+Arguments
+* path-to-puzzle - path to the file containing the puzzle
+* solver to use, available options are **exact**, **bfs** and **dfs**
 
-So probably we should do something smarter. 
 
-1. sort the fields based on those with minimal amount of options(if there are fields with only single possible value, it can be a benefit), start from them
-2. some "clever" state space search? with what heuristic?
+## Deploy
+To deploy the app, you can use shadowJar.
+```
+gradle shadowJar
+```
+It will create a jar archive _build/libs/sudoku-solver-1.0-SNAPSHOT.jar_, which can then be executed.
+```
+ java -jar build/libs/sudoku-solver-1.0-SNAPSHOT.jar path-to-puzzle [solver-to-use]
+```
+ 
