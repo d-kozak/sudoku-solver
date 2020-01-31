@@ -1,5 +1,6 @@
 package io.dkozak.sudoku.solver
 
+import io.dkozak.sudoku.model.SimpleSudokuCell
 import io.dkozak.sudoku.model.SimpleSudokuPuzzle
 
 /**
@@ -8,7 +9,7 @@ import io.dkozak.sudoku.model.SimpleSudokuPuzzle
  * each cell to all it's options until the puzzle is fully set
  * very inefficient
  */
-class SimpleBacktrackingSolver : SudokuSolver {
+class SimpleBacktrackingSolver(override val initialPuzzle: SimpleSudokuPuzzle) : SudokuSolver<SimpleSudokuCell, SimpleSudokuPuzzle> {
 
 
     /**

@@ -2,30 +2,35 @@ package io.dkozak.sudoku.solver
 
 import io.dkozak.sudoku.model.OptionsAwareSudokuCell
 import io.dkozak.sudoku.model.OptionsAwareSudokuPuzzle
+import mu.KotlinLogging
 import java.util.*
 
+private val logger = KotlinLogging.logger { }
 
 /**
  * Tries to solve the puzzle without any guessing by using the following rules
  * 1) if there is a cell with only one option left, set it
  * 2) if there is only one option for a given number in a row, col or region, set it
  */
-class OptionsAwareExactSolver(val puzzle: OptionsAwareSudokuPuzzle) {
+class OptionsAwareExactSolver(override val initialPuzzle: OptionsAwareSudokuPuzzle, val printPartialSolution: Boolean = false) : SudokuSolver<OptionsAwareSudokuCell, OptionsAwareSudokuPuzzle> {
     val queue: Queue<Triple<Int, Int, Int>> = LinkedList()
-    val numSlots = Array(puzzle.size) { -1 to -1 }
+    val numSlots = Array(initialPuzzle.size) { -1 to -1 }
 
-    fun solve(): OptionsAwareSudokuPuzzle? {
-        scanPuzzle()
+    override fun solve(puzzle: OptionsAwareSudokuPuzzle): OptionsAwareSudokuPuzzle? {
+        scanPuzzle(puzzle)
         while (queue.isNotEmpty()) {
             while (queue.isNotEmpty()) {
                 val (row, col, value) = queue.poll()
                 if (puzzle[row, col].isSet) continue
                 puzzle[row, col] = value
             }
-            scanPuzzle()
+            scanPuzzle(puzzle)
         }
 
-        return if (puzzle.isValid(false)) puzzle else null
+        return if (puzzle.isValid(false)) puzzle else {
+            if (printPartialSolution) logger.info { "Managed to reach partially completed puzzle:\n ${puzzle.toPrintableString()}" }
+            null
+        }
     }
 
     private fun processCell(row: Int, col: Int, cell: OptionsAwareSudokuCell) {
@@ -52,7 +57,7 @@ class OptionsAwareExactSolver(val puzzle: OptionsAwareSudokuPuzzle) {
         }
     }
 
-    private fun scanPuzzle() {
+    private fun scanPuzzle(puzzle: OptionsAwareSudokuPuzzle) {
 
         for ((row, col, cell) in puzzle.allCellsIndexed()) {
             if (row == 0) {

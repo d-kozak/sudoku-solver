@@ -1,5 +1,6 @@
 package io.dkozak.sudoku.solver
 
+import io.dkozak.sudoku.model.OptionsAwareSudokuCell
 import io.dkozak.sudoku.model.OptionsAwareSudokuPuzzle
 import mu.KotlinLogging
 import java.util.*
@@ -11,25 +12,21 @@ private val logger = KotlinLogging.logger { }
  * If the exact solver fails to fully complete the puzzle,
  * then the cell with fewest options is used and all the options are checked in a bfs manner.
  */
-class OptionsAwareBfsSolver(startPuzzle: OptionsAwareSudokuPuzzle) {
-
+class OptionsAwareBfsSolver(override val initialPuzzle: OptionsAwareSudokuPuzzle) : SudokuSolver<OptionsAwareSudokuCell, OptionsAwareSudokuPuzzle> {
     /**
      * Queue of all remaining configurations to check
      */
     val queue: Queue<OptionsAwareSudokuPuzzle> = LinkedList()
 
-    init {
-        queue.add(startPuzzle)
-    }
-
     /**
      * @return the solved puzzle or null if no solution is found
      */
-    fun solve(): OptionsAwareSudokuPuzzle? {
+    override fun solve(puzzle: OptionsAwareSudokuPuzzle): OptionsAwareSudokuPuzzle? {
+        queue.add(puzzle)
         while (queue.isNotEmpty()) {
             val current = queue.poll()
 
-            val maybeSolution = OptionsAwareExactSolver(current).solve()
+            val maybeSolution = OptionsAwareExactSolver(current).solve(current)
             if (maybeSolution != null) return maybeSolution
 
 
