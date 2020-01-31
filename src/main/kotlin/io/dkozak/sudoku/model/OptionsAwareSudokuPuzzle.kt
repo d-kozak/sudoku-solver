@@ -123,7 +123,7 @@ class OptionsAwareSudokuPuzzle(override val content: Array<Array<OptionsAwareSud
     fun copy(): OptionsAwareSudokuPuzzle {
         val res = OptionsAwareSudokuPuzzle(size)
         for ((row, col, cell) in allCellsIndexed()) {
-            if (cell.isSet)
+            if (cell.isSet && cell.value != -1)
                 res[row, col] = cell.value
         }
         return res

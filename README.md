@@ -28,4 +28,9 @@ It will create a jar archive _build/libs/sudoku-solver-1.0-SNAPSHOT.jar_, which 
 ```
  java -jar build/libs/sudoku-solver-1.0-SNAPSHOT.jar path-to-puzzle [solver-to-use]
 ```
- 
+
+## Test
+You can run all the tests using the following command.
+```
+gradle clean test --info
+```
