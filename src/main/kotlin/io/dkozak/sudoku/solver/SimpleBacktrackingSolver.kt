@@ -3,7 +3,10 @@ package io.dkozak.sudoku.solver
 import io.dkozak.sudoku.model.SimpleSudokuPuzzle
 
 /**
- * Very simple backtracking solution, very inefficient
+ * Very simple backtracking solution.
+ * Tries to solve the puzzle by iterating over the puzzle from left to right, top to bottom and recursively tries to set
+ * each cell to all it's options until the puzzle is fully set
+ * very inefficient
  */
 class SimpleBacktrackingSolver : SudokuSolver {
 
@@ -14,7 +17,7 @@ class SimpleBacktrackingSolver : SudokuSolver {
     private var count = 0
 
     /**
-     * the maximum depth of recursion, that is the number of empty cells
+     * the maximum depth of recursion, which is the number of empty cells
      */
     private var maxDepth = 0
 
@@ -36,10 +39,10 @@ class SimpleBacktrackingSolver : SudokuSolver {
             println(puzzle)
         if (count % 1_000_000 == 0)
             println("call ${count}, depth ${depth}/${maxDepth}")
-        var problemFound = false
+        var emptyCellFound = false
         for ((i, j, cell) in puzzle.allCellsIndexed()) {
             if (cell.isEmpty) {
-                problemFound = true
+                emptyCellFound = true
                 val options = puzzle.numbersFor(i, j)
                 if (options.isEmpty()) return null
                 for (option in options) {
@@ -50,6 +53,6 @@ class SimpleBacktrackingSolver : SudokuSolver {
                 }
             }
         }
-        return if (!problemFound) puzzle else null
+        return if (!emptyCellFound) puzzle else null
     }
 }

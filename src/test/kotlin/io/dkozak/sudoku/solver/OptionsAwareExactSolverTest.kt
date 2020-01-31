@@ -11,7 +11,7 @@ import org.junit.jupiter.api.fail
 class OptionsAwareExactSolverTest {
 
     @Test
-    fun `load first new`() {
+    fun `solve first`() {
         val puzzle = loadPuzzle("src/test/resources/puzzles/first.sudoku", ::OptionsAwareSudokuPuzzle)
         val solution = OptionsAwareExactSolver(puzzle).solve()
         solution?.validateOrFail(false) ?: fail("solution should be found")
@@ -19,7 +19,7 @@ class OptionsAwareExactSolverTest {
     }
 
     @Test
-    fun `load second new`() {
+    fun `solve second`() {
         // the exact solver cannot handle "guessing", so there should be no solution
         val puzzle = loadPuzzle("src/test/resources/puzzles/second.sudoku", ::OptionsAwareSudokuPuzzle)
         assertThat(OptionsAwareExactSolver(puzzle).solve()).isNull()

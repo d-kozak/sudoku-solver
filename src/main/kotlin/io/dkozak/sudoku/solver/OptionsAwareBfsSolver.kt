@@ -6,14 +6,25 @@ import java.util.*
 
 private val logger = KotlinLogging.logger { }
 
+/**
+ * Uses ExactSolver as long as possible.
+ * If the exact solver fails to fully complete the puzzle,
+ * then the cell with fewest options is used and all the options are checked in a bfs manner.
+ */
 class OptionsAwareBfsSolver(startPuzzle: OptionsAwareSudokuPuzzle) {
 
+    /**
+     * Queue of all remaining configurations to check
+     */
     val queue: Queue<OptionsAwareSudokuPuzzle> = LinkedList()
 
     init {
         queue.add(startPuzzle)
     }
 
+    /**
+     * @return the solved puzzle or null if no solution is found
+     */
     fun solve(): OptionsAwareSudokuPuzzle? {
         while (queue.isNotEmpty()) {
             val current = queue.poll()

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.fail
 class OptionsAwareBfsSolverTest {
 
     @Test
-    fun `load first new`() {
+    fun `solve first`() {
         val puzzle = loadPuzzle("src/test/resources/puzzles/first.sudoku", ::OptionsAwareSudokuPuzzle)
         val solution = OptionsAwareBfsSolver(puzzle).solve()
         solution?.validateOrFail(false) ?: fail("solution should be found")
@@ -17,7 +17,7 @@ class OptionsAwareBfsSolverTest {
     }
 
     @Test
-    fun `load second new`() {
+    fun `solve second`() {
         val puzzle = loadPuzzle("src/test/resources/puzzles/second.sudoku", ::OptionsAwareSudokuPuzzle)
         val solution = OptionsAwareBfsSolver(puzzle).solve()
         solution?.validateOrFail(false) ?: fail("solution should be found")

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 
 class OptionsAwareDfsSolverTest {
     @Test
-    fun `load first new`() {
+    fun `solve first`() {
         val puzzle = loadPuzzle("src/test/resources/puzzles/first.sudoku", ::OptionsAwareSudokuPuzzle)
         val solution = OptionsAwareDfsSolver(puzzle).solve()
         solution?.validateOrFail(false) ?: org.junit.jupiter.api.fail("solution should be found")
@@ -14,7 +14,7 @@ class OptionsAwareDfsSolverTest {
     }
 
     @Test
-    fun `load second new`() {
+    fun `solve second`() {
         val puzzle = loadPuzzle("src/test/resources/puzzles/second.sudoku", ::OptionsAwareSudokuPuzzle)
         val solution = OptionsAwareDfsSolver(puzzle).solve()
         solution?.validateOrFail(false) ?: org.junit.jupiter.api.fail("solution should be found")

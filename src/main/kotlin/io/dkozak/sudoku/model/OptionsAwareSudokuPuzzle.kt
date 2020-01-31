@@ -3,29 +3,15 @@ package io.dkozak.sudoku.model
 import mu.KotlinLogging
 import java.util.*
 
-fun OptionsAwareSudokuPuzzle.toSimpleSudokuPuzzle(): SimpleSudokuPuzzle {
-    val puzzle = SimpleSudokuPuzzle(this.size)
-
-    for ((i, j, cell) in allCellsIndexed()) {
-        puzzle[i, j] = cell.value
-    }
-
-    return puzzle
-}
-
+/**
+ * Representation of a sudoku cell which stores all possible values that can be assigned to the cell.
+ */
 class OptionsAwareSudokuCell(val size: Int) : SudokuCell {
 
-    override val isEmpty: Boolean
-        get() = !isSet
-
-    override fun clear() {
-        content.clear()
-        isSet = false
-    }
-
-    val content: BitSet = BitSet(size)
-
     companion object {
+        /**
+         * Creates an empty cell
+         */
         fun empty(size: Int): OptionsAwareSudokuCell {
             val cell = OptionsAwareSudokuCell(size)
             for (i in 0 until size) {
@@ -35,8 +21,27 @@ class OptionsAwareSudokuCell(val size: Int) : SudokuCell {
         }
     }
 
+    override val isEmpty: Boolean
+        get() = !isSet
+
+    /**
+     * Each assignable value has it's bit set to 1
+     */
+    val content: BitSet = BitSet(size)
+
+    /**
+     * true if the value has been assigned
+     */
     var isSet = false
 
+    override fun clear() {
+        content.clear()
+        isSet = false
+    }
+
+    /**
+     *
+     */
     override var value: Int
         set(value) {
             content.clear()
@@ -54,6 +59,9 @@ class OptionsAwareSudokuCell(val size: Int) : SudokuCell {
         }
 
 
+    /**
+     * returns all assignable numbers in a list
+     */
     fun allOptions(): List<Int> {
         val res = mutableListOf<Int>()
         for (i in 0 until size) {
@@ -67,6 +75,9 @@ class OptionsAwareSudokuCell(val size: Int) : SudokuCell {
 
 private val logger = KotlinLogging.logger { }
 
+/**
+ * In this representation, all possible options for each cell are stored
+ */
 class OptionsAwareSudokuPuzzle(override val content: Array<Array<OptionsAwareSudokuCell>>) : SudokuPuzzle<OptionsAwareSudokuCell> {
 
     constructor(size: Int) : this(Array(size) { Array(size) { OptionsAwareSudokuCell.empty(size) } })
@@ -79,6 +90,9 @@ class OptionsAwareSudokuPuzzle(override val content: Array<Array<OptionsAwareSud
         validateOrFail(true)
     }
 
+    /**
+     * The set as more complex, as it has to remove the inserted number from other cells in the row, col and region
+     */
     override fun set(row: Int, col: Int, value: Int) {
         for (cell in row(row))
             cell.content.clear(value - 1)
@@ -89,11 +103,14 @@ class OptionsAwareSudokuPuzzle(override val content: Array<Array<OptionsAwareSud
         content[row][col].value = value
     }
 
+    /**
+     * Makes a deep copy of the puzzle
+     */
     fun copy(): OptionsAwareSudokuPuzzle {
         val res = OptionsAwareSudokuPuzzle(size)
-        for ((i, j, cell) in allCellsIndexed()) {
+        for ((row, col, cell) in allCellsIndexed()) {
             if (cell.isSet)
-                res[i, j] = cell.value
+                res[row, col] = cell.value
         }
         return res
     }
@@ -102,4 +119,18 @@ class OptionsAwareSudokuPuzzle(override val content: Array<Array<OptionsAwareSud
     override fun toString(): String {
         return "OptionsAwareSudokuPuzzle\n ${toPrintableString()}"
     }
+}
+
+
+/**
+ * Utility, converts OptionsAwareSudokuPuzzle to SimpleSudokuPuzzle
+ */
+fun OptionsAwareSudokuPuzzle.toSimpleSudokuPuzzle(): SimpleSudokuPuzzle {
+    val puzzle = SimpleSudokuPuzzle(this.size)
+
+    for ((i, j, cell) in allCellsIndexed()) {
+        puzzle[i, j] = cell.value
+    }
+
+    return puzzle
 }

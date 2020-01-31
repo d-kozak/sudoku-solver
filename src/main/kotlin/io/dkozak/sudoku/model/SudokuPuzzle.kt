@@ -1,5 +1,8 @@
 package io.dkozak.sudoku.model
 
+/**
+ * Once cell in the puzzle
+ */
 interface SudokuCell {
     /**
      * value of the cell, -1 for empty cell
@@ -11,7 +14,7 @@ interface SudokuCell {
     val isEmpty: Boolean
 
     /**
-     * clears the cell
+     * clears the value cell
      */
     fun clear()
 }

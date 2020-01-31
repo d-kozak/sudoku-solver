@@ -1,5 +1,8 @@
 package io.dkozak.sudoku.model
 
+/**
+ * Simple sudoku cell, holding only the integer value
+ */
 data class SimpleSudokuCell(override var value: Int = -1) : SudokuCell {
     override val isEmpty: Boolean
         get() = value == -1

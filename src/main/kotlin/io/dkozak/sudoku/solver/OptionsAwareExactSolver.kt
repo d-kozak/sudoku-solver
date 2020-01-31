@@ -5,6 +5,11 @@ import io.dkozak.sudoku.model.OptionsAwareSudokuPuzzle
 import java.util.*
 
 
+/**
+ * Tries to solve the puzzle without any guessing by using the following rules
+ * 1) if there is a cell with only one option left, set it
+ * 2) if there is only one option for a given number in a row, col or region, set it
+ */
 class OptionsAwareExactSolver(val puzzle: OptionsAwareSudokuPuzzle) {
     val queue: Queue<Triple<Int, Int, Int>> = LinkedList()
     val numSlots = Array(puzzle.size) { -1 to -1 }
