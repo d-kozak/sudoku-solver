@@ -40,7 +40,7 @@ However, the traversal that is performed when assigning a value to a cell has to
 just makes the solver code cleaner while adding only a small overhead.
 
 ## Test data
-Two puzzle's were already provided as part of the assignment. On top of that, I decided to add one more - an empty puzzle, which is an edge case.
+Two puzzles were already provided as part of the assignment. On top of that, I decided to add one more - an empty puzzle, which is an edge case.
 * [Simple](src/test/resources/puzzles/first.sudoku)
 * [Difficult](src/test/resources/puzzles/second.sudoku)
 * [Empty](src/test/resources/puzzles/empty.sudoku)
@@ -59,7 +59,7 @@ all possible combinations of numbers and check if the result is a valid sudoku. 
 For a typical sudoku, there are 9 rows and 9 columns, each of them containing values _from 1 to 9_. Therefore there are _9^2_ cells and each of them can have 9 values.
 Therefore the total number of ways to fill the puzzle is _9^81_ and in general it is _PuzzleSize^(PuzzleSize^2)_. Of course, real puzzles have some cells filled in 
 already, but still the number of options is pretty high. Therefore the brute force is not a good approach for this problem. 
-This one I haven't even tried to implement, knowing that it is way to ineffective. 
+This one I haven't even tried to implement, knowing that it is way too ineffective. 
 
 One observation about sudoku is that even though thare are so many states to check, a lot of them are not valid. To skip the invalid ones, one might try to fill
 in the puzle only with valid numbers, which is what my first solver [SimpleBacktrackingSolver](src/main/kotlin/io/dkozak/sudoku/solver/SimpleBacktrackingSolver.kt) 
@@ -73,10 +73,10 @@ failed to provide a solution even for the [Simple](src/test/resources/puzzles/fi
 The second approach I tried was to solve the puzzle in a more 'human way' -> that is in a way how a human would try to solve it. The 
 [OptionsAwareExactSolver](src/main/kotlin/io/dkozak/sudoku/solver/OptionsAwareExactSolver.kt) uses the [OptionsAwareSudokuPuzzle](src/main/kotlin/io/dkozak/sudoku/model/OptionsAwareSudokuPuzzle.kt)
 model and works in the following way. It keeps filling in all cells which can have only a single value assigned to them. When it halts, the puzzle is either fully
-solved or only cells, whose value cannot be exactly determined, remains. This solver manages to solve the [Simple](src/test/resources/puzzles/first.sudoku) puzzle,
+solved or only cells, whose value cannot be exactly determined, remain empty. This solver manages to solve the [Simple](src/test/resources/puzzles/first.sudoku) puzzle,
 however it fails for the [Difficult](src/test/resources/puzzles/second.sudoku) one, because there are not enough numbers given to make an exact decision each time.
 
-Then final approach is a combination of the two previous ones. The idea is to fill in as much cells as possible using [OptionsAwareExactSolver](src/main/kotlin/io/dkozak/sudoku/solver/OptionsAwareExactSolver.kt)
+The final approach is a combination of the two previous. The idea is to fill in as much cells as possible using [OptionsAwareExactSolver](src/main/kotlin/io/dkozak/sudoku/solver/OptionsAwareExactSolver.kt)
 in each step and if any empty cells remain, find the one with lowest amount of options and try all of them. I implemented two different solvers based on this idea,
 [OptionsAwareBfsSolver](src/main/kotlin/io/dkozak/sudoku/solver/OptionsAwareBfsSolver.kt) and [OptionsAwareDfsSolver](src/main/kotlin/io/dkozak/sudoku/solver/OptionsAwareDfsSolver.kt).
 As the names suggest, their only difference is in the way the state space traversal is handled. Bfs solver keeps a queue of all solutions to check, while
@@ -88,3 +88,14 @@ while dfs gives us no guarantees and can even get stuck in an infinite loop. How
 (because the same amount of numbers is needed for each of them) and the infinite loop also cannot happen, because in each branch either a valid solution is found 
 or the puzzle becomes invalid after at most as many calls as is the number of empty cells.
         
+## Conclusion
+Based on the reasoning above, I decided to use the [OptionsAwareDfsSolver](src/main/kotlin/io/dkozak/sudoku/solver/OptionsAwareDfsSolver.kt) as the default
+solver in the program. This solver first fills in all cells, whose value can be exactly determined, and if any empty cells remain, it picks the one with 
+the lowest number of options and tries all of them recursively in a depth first manner. It managed to solve all three test cases - [Simple](src/test/resources/puzzles/first.sudoku), 
+[Difficult](src/test/resources/puzzles/second.sudoku), [Empty](src/test/resources/puzzles/empty.sudoku) and it also passes the [fuzz test](src/test/kotlin/io/dkozak/sudoku/solver/DfsFuzzTest.kt).
+
+## Ideas for extension
+-[ ] Performance measurements - Measure the execution time and memory consumption for different solvers and compare them.
+-[ ] More advanced search space traversals - Try to use a heuristic (maybe even random choice) to prioritize options at the decision points. 
+However, it is important to keep the cost of computing heuristic function low.
+-[ ] Parallel solver - If there are multiple choices, try them concurrently (up to the number of cores, since this task is computational intensive). 
