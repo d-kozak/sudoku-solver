@@ -98,10 +98,11 @@ the lowest number of options and tries all of them recursively in a depth first 
 
 ## Ideas for extension
 -[ ] Performance measurements - Measure the execution time and memory consumption for different solvers and compare them.
+
 -[ ] More advanced search space traversals - Try to use a heuristic (maybe even random choice) to prioritize options at the decision points. 
 However, it is important to keep the cost of computing heuristic function low.
--[ ] Parallel solver - If there are multiple choices, try them concurrently (up to the number of cores, since this task is computational intensive).
-An idea was already implemented in [OptionsAwareParallelSolver](src/main/kotlin/io/dkozak/sudoku/solver/OptionsAwareParallelSolver.kt), which is very similar to 
+
+-[ ] Parallel solver - If there are multiple choices, try them concurrently (up to the number of cores, since this task is computational intensive). An idea was already implemented in [OptionsAwareParallelSolver](src/main/kotlin/io/dkozak/sudoku/solver/OptionsAwareParallelSolver.kt), which is very similar to 
 [OptionsAwareDfsSolver](src/main/kotlin/io/dkozak/sudoku/solver/OptionsAwareDfsSolver.kt), but it uses coroutines to make the code concurrent and it executes them
 in the default scope, which uses as many threads as there are CPU cores. However, this solver transforms the dfs traversal back to bfs, so it inherits the same problems.
 It solves the [Simple](src/test/resources/puzzles/first.sudoku) and [Difficult](src/test/resources/puzzles/second.sudoku) puzzles, but fails for the [Empty](src/test/resources/puzzles/empty.sudoku).
