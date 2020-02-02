@@ -27,7 +27,7 @@ class SimpleBacktrackingSolver(override val initialPuzzle: SimpleSudokuPuzzle) :
         maxDepth = 0
 
         for (cell in puzzle.allCells())
-            if (cell.isEmpty)
+            if (cell.isEmpty())
                 maxDepth++
 
         return solveHelper(puzzle, 1)
@@ -42,7 +42,7 @@ class SimpleBacktrackingSolver(override val initialPuzzle: SimpleSudokuPuzzle) :
             println("call ${count}, depth ${depth}/${maxDepth}")
         var emptyCellFound = false
         for ((i, j, cell) in puzzle.allCellsIndexed()) {
-            if (cell.isEmpty) {
+            if (cell.isEmpty()) {
                 emptyCellFound = true
                 val options = puzzle.numbersFor(i, j)
                 if (options.isEmpty()) return null
@@ -50,7 +50,7 @@ class SimpleBacktrackingSolver(override val initialPuzzle: SimpleSudokuPuzzle) :
                     puzzle[i, j] = option
                     val maybeSolution = solveHelper(puzzle, depth + 1)
                     if (maybeSolution != null) return maybeSolution
-                    puzzle[i, j].clear()
+                    puzzle[i, j] = -1
                 }
             }
         }

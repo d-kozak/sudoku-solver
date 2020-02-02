@@ -1,5 +1,7 @@
 package io.dkozak.sudoku.model
 
+import io.dkozak.sudoku.model.utils.isNotEmpty
+
 /**
  * Once cell in the puzzle
  */
@@ -8,15 +10,11 @@ interface SudokuCell {
      * value of the cell, -1 for empty cell
      */
     var value: Byte
+
     /**
      * empty cell check, just for convenience (not to have to compare with -1)
      */
-    val isEmpty: Boolean
-
-    /**
-     * clears the value cell
-     */
-    fun clear()
+    fun isEmpty(): Boolean = value == (-1).toByte()
 }
 
 /**
@@ -143,13 +141,13 @@ interface SudokuPuzzle<CellType : SudokuCell> {
     fun numbersFor(i: Int, j: Int): List<Byte> {
         val possibleNumbers = MutableList(size) { (it + 1).toByte() }
         for (cell in row(i))
-            if (!cell.isEmpty) possibleNumbers.remove(cell.value)
+            if (cell.isNotEmpty()) possibleNumbers.remove(cell.value)
         for (cell in col(j)) {
-            if (!cell.isEmpty) possibleNumbers.remove(cell.value)
+            if (cell.isNotEmpty()) possibleNumbers.remove(cell.value)
         }
 
         for (cell in region(i, j)) {
-            if (!cell.isEmpty) possibleNumbers.remove(cell.value)
+            if (cell.isNotEmpty()) possibleNumbers.remove(cell.value)
         }
         return possibleNumbers
     }

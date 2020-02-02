@@ -31,7 +31,7 @@ class OptionsAwareBfsSolver(override val initialPuzzle: OptionsAwareSudokuPuzzle
 
 
             val emptyCells = current.allCellsIndexed()
-                    .filterNot { it.third.isSet }
+                    .filter { it.third.isEmpty() }
                     .toList()
             val (i, j, bestCell) = emptyCells
                     .minBy { it.third.content.cardinality() }

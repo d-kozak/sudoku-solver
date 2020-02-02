@@ -19,7 +19,7 @@ class OptionsAwareParallelSolver(override val initialPuzzle: OptionsAwareSudokuP
         if (maybeSolution != null) return@withContext maybeSolution
 
         val emptyCells = puzzle.allCellsIndexed()
-                .filterNot { it.third.isSet }
+                .filter { it.third.isEmpty() }
                 .toList()
         val (i, j, bestCell) = emptyCells
                 .minBy { it.third.content.cardinality() }

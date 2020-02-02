@@ -1,7 +1,9 @@
 package io.dkozak.sudoku.model
 
+import io.dkozak.sudoku.model.utils.isNotEmpty
 import mu.KotlinLogging
 import java.util.*
+import kotlin.math.sqrt
 
 /**
  * Representation of a sudoku cell which stores all possible values that can be assigned to the cell.
@@ -21,48 +23,25 @@ class OptionsAwareSudokuCell(val size: Byte) : SudokuCell {
         }
     }
 
-    override val isEmpty: Boolean
-        get() = !isSet
-
     /**
      * Each assignable value has it's bit set to 1
      */
     val content: BitSet = BitSet(size.toInt())
 
+    override var value: Byte = -1
+
     /**
-     * true if the value has been assigned
+     * @return the only possible option that can be assigned to the cell based on the content of the bitset
+     * or -1, if the number of options != 1
      */
-    var isSet = false
-
-    override fun clear() {
-        content.clear()
-        isSet = false
-    }
+    val onlyOption: Byte
+        get() = if (isNotEmpty() && content.cardinality() == 1) (content.nextSetBit(0) + 1).toByte() else -1
 
     /**
-     *
-     */
-    override var value: Byte
-        set(value) {
-            content.clear()
-            isSet = true
-            content.set(value - 1)
-        }
-        get() {
-            var res: Byte = -1
-            for (i in 0 until size)
-                if (content[i]) {
-                    if (res != (-1).toByte()) return -1
-                    res = (i + 1).toByte()
-                }
-            return res
-        }
-
-
-    /**
-     * returns all assignable numbers in a list
+     * returns all assignable options in a list
      */
     fun allOptions(): List<Byte> {
+        check(isEmpty()) { "options for a filled cell should never be enumerated, there is no need for that" }
         val res = mutableListOf<Byte>()
         for (i in 0 until size) {
             if (content[i]) res.add((i + 1).toByte())
@@ -71,7 +50,7 @@ class OptionsAwareSudokuCell(val size: Byte) : SudokuCell {
     }
 
 
-    override fun toString(): String = if (isEmpty) " " else value.toString()
+    override fun toString(): String = if (isEmpty()) " " else value.toString()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -98,7 +77,7 @@ class OptionsAwareSudokuPuzzle(override val content: Array<Array<OptionsAwareSud
 
     override val size = content.size
 
-    override val regionSize: Int = Math.sqrt(size.toDouble()).toInt()
+    override val regionSize: Int = sqrt(size.toDouble()).toInt()
 
     init {
         validateOrFail(true)
@@ -108,6 +87,7 @@ class OptionsAwareSudokuPuzzle(override val content: Array<Array<OptionsAwareSud
      * The set as more complex, as it has to remove the inserted number from other cells in the row, col and region
      */
     override fun set(row: Int, col: Int, value: Byte) {
+        check(value in 1..size) { "value $value should be within range 1..${size}" }
         for (cell in row(row))
             cell.content.clear(value - 1)
         for (cell in col(col))
@@ -123,7 +103,7 @@ class OptionsAwareSudokuPuzzle(override val content: Array<Array<OptionsAwareSud
     fun copy(): OptionsAwareSudokuPuzzle {
         val res = OptionsAwareSudokuPuzzle(size)
         for ((row, col, cell) in allCellsIndexed()) {
-            if (cell.isSet && cell.value != (-1).toByte())
+            if (cell.isNotEmpty())
                 res[row, col] = cell.value
         }
         return res

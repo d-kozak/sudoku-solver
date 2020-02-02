@@ -4,14 +4,9 @@ package io.dkozak.sudoku.model
  * Simple sudoku cell, holding only the integer value
  */
 data class SimpleSudokuCell(override var value: Byte = -1) : SudokuCell {
-    override val isEmpty: Boolean
-        get() = value == (-1).toByte()
 
-    override fun toString(): String = if (isEmpty) " " else value.toString()
+    override fun toString(): String = if (isEmpty()) " " else value.toString()
 
-    override fun clear() {
-        value = -1
-    }
 }
 
 /**

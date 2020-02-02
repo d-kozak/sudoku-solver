@@ -24,7 +24,7 @@ class OptionsAwareDfsSolver(override val initialPuzzle: OptionsAwareSudokuPuzzle
         if (maybeSolution != null) return maybeSolution
 
         val emptyCells = puzzle.allCellsIndexed()
-                .filterNot { it.third.isSet }
+                .filter { it.third.isEmpty() }
                 .toList()
         val (i, j, bestCell) = emptyCells
                 .minBy { it.third.content.cardinality() }
@@ -33,7 +33,7 @@ class OptionsAwareDfsSolver(override val initialPuzzle: OptionsAwareSudokuPuzzle
         for (option in bestCell.allOptions()) {
             val copy = puzzle.copy()
             copy[i, j] = option
-            logger.info { "Guessing $option for [$i][$j], remains ${emptyCells.size} empty cells" }
+//            logger.info { "Guessing $option for [$i][$j], remains ${emptyCells.size} empty cells" }
             val maybeSolution = OptionsAwareDfsSolver(copy).solve(copy)
             if (maybeSolution != null) return maybeSolution
         }

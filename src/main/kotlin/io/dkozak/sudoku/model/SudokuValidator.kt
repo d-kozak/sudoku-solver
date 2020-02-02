@@ -1,5 +1,7 @@
 package io.dkozak.sudoku.model
 
+import io.dkozak.sudoku.model.utils.isNotEmpty
+
 
 /**
  * Validation logic for sudoku puzzle
@@ -51,9 +53,9 @@ internal class SudokuValidator<CellType : SudokuCell>(val puzzle: SudokuPuzzle<C
     private fun validateSequence(prefix: String, sequence: Sequence<Triple<Int, Int, CellType>>) {
         val numLocations = mutableMapOf<Byte, MutableSet<Pair<Int, Int>>>()
         for ((i, j, cell) in sequence) {
-            if (cell.isEmpty && !allowEmptyCells)
+            if (cell.isEmpty() && !allowEmptyCells)
                 errors.add("$prefix: [$i][$j] is empty")
-            else if (!cell.isEmpty) {
+            else if (cell.isNotEmpty()) {
                 numLocations.computeIfAbsent(cell.value) { mutableSetOf() }
                         .add(i to j)
             }
