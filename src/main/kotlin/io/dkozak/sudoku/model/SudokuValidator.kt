@@ -49,7 +49,7 @@ internal class SudokuValidator<CellType : SudokuCell>(val puzzle: SudokuPuzzle<C
     }
 
     private fun validateSequence(prefix: String, sequence: Sequence<Triple<Int, Int, CellType>>) {
-        val numLocations = mutableMapOf<Int, MutableSet<Pair<Int, Int>>>()
+        val numLocations = mutableMapOf<Byte, MutableSet<Pair<Int, Int>>>()
         for ((i, j, cell) in sequence) {
             if (cell.isEmpty && !allowEmptyCells)
                 errors.add("$prefix: [$i][$j] is empty")

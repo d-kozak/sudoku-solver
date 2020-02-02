@@ -7,7 +7,7 @@ interface SudokuCell {
     /**
      * value of the cell, -1 for empty cell
      */
-    var value: Int
+    var value: Byte
     /**
      * empty cell check, just for convenience (not to have to compare with -1)
      */
@@ -47,7 +47,7 @@ interface SudokuPuzzle<CellType : SudokuCell> {
     /**
      * set value at given coordinates
      */
-    operator fun set(row: Int, col: Int, value: Int)
+    operator fun set(row: Int, col: Int, value: Byte)
 
 
     /**
@@ -126,6 +126,10 @@ interface SudokuPuzzle<CellType : SudokuCell> {
     fun validate(allowEmptyCells: Boolean): List<String> = SudokuValidator(this, allowEmptyCells).validate()
 
 
+    /**
+     * Tries to validate the puzzle
+     * @throws IllegalStateException if any errors are found
+     */
     fun validateOrFail(allowEmptyCells: Boolean) {
         val errors = validate(allowEmptyCells)
         if (errors.isNotEmpty()) {
@@ -134,10 +138,10 @@ interface SudokuPuzzle<CellType : SudokuCell> {
     }
 
     /**
-     * Returns a list of candidate numbers for a specific cell
+     * @return a set of candidate numbers for a specific cell
      */
-    fun numbersFor(i: Int, j: Int): Set<Int> {
-        val possibleNumbers = (1..size).toMutableSet()
+    fun numbersFor(i: Int, j: Int): List<Byte> {
+        val possibleNumbers = MutableList(size) { (it + 1).toByte() }
         for (cell in row(i))
             if (!cell.isEmpty) possibleNumbers.remove(cell.value)
         for (cell in col(j)) {
@@ -150,6 +154,11 @@ interface SudokuPuzzle<CellType : SudokuCell> {
         return possibleNumbers
     }
 
+    /**
+     * Generates a human readable string that can for example be printed into the console.
+     * toString() was not overrided, because interfaces are not allowed to overwrite methods
+     * coming from Any.
+     */
     fun toPrintableString(): String = buildString {
         for ((i, row) in content.withIndex()) {
             if (i % 3 == 0) {

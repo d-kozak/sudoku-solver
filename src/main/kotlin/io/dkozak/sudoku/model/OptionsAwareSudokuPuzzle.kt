@@ -6,13 +6,13 @@ import java.util.*
 /**
  * Representation of a sudoku cell which stores all possible values that can be assigned to the cell.
  */
-class OptionsAwareSudokuCell(val size: Int) : SudokuCell {
+class OptionsAwareSudokuCell(val size: Byte) : SudokuCell {
 
     companion object {
         /**
          * Creates an empty cell
          */
-        fun empty(size: Int): OptionsAwareSudokuCell {
+        fun empty(size: Byte): OptionsAwareSudokuCell {
             val cell = OptionsAwareSudokuCell(size)
             for (i in 0 until size) {
                 cell.content.set(i)
@@ -27,7 +27,7 @@ class OptionsAwareSudokuCell(val size: Int) : SudokuCell {
     /**
      * Each assignable value has it's bit set to 1
      */
-    val content: BitSet = BitSet(size)
+    val content: BitSet = BitSet(size.toInt())
 
     /**
      * true if the value has been assigned
@@ -42,18 +42,18 @@ class OptionsAwareSudokuCell(val size: Int) : SudokuCell {
     /**
      *
      */
-    override var value: Int
+    override var value: Byte
         set(value) {
             content.clear()
             isSet = true
             content.set(value - 1)
         }
         get() {
-            var res: Int = -1
+            var res: Byte = -1
             for (i in 0 until size)
                 if (content[i]) {
-                    if (res != -1) return -1
-                    res = i + 1
+                    if (res != (-1).toByte()) return -1
+                    res = (i + 1).toByte()
                 }
             return res
         }
@@ -62,10 +62,10 @@ class OptionsAwareSudokuCell(val size: Int) : SudokuCell {
     /**
      * returns all assignable numbers in a list
      */
-    fun allOptions(): List<Int> {
-        val res = mutableListOf<Int>()
+    fun allOptions(): List<Byte> {
+        val res = mutableListOf<Byte>()
         for (i in 0 until size) {
-            if (content[i]) res.add(i + 1)
+            if (content[i]) res.add((i + 1).toByte())
         }
         return res
     }
@@ -83,7 +83,7 @@ class OptionsAwareSudokuCell(val size: Int) : SudokuCell {
     }
 
     override fun hashCode(): Int {
-        return value
+        return value.toInt()
     }
 }
 
@@ -94,7 +94,7 @@ private val logger = KotlinLogging.logger { }
  */
 class OptionsAwareSudokuPuzzle(override val content: Array<Array<OptionsAwareSudokuCell>>) : SudokuPuzzle<OptionsAwareSudokuCell> {
 
-    constructor(size: Int) : this(Array(size) { Array(size) { OptionsAwareSudokuCell.empty(size) } })
+    constructor(size: Int) : this(Array(size) { Array(size) { OptionsAwareSudokuCell.empty(size.toByte()) } })
 
     override val size = content.size
 
@@ -107,7 +107,7 @@ class OptionsAwareSudokuPuzzle(override val content: Array<Array<OptionsAwareSud
     /**
      * The set as more complex, as it has to remove the inserted number from other cells in the row, col and region
      */
-    override fun set(row: Int, col: Int, value: Int) {
+    override fun set(row: Int, col: Int, value: Byte) {
         for (cell in row(row))
             cell.content.clear(value - 1)
         for (cell in col(col))
@@ -123,7 +123,7 @@ class OptionsAwareSudokuPuzzle(override val content: Array<Array<OptionsAwareSud
     fun copy(): OptionsAwareSudokuPuzzle {
         val res = OptionsAwareSudokuPuzzle(size)
         for ((row, col, cell) in allCellsIndexed()) {
-            if (cell.isSet && cell.value != -1)
+            if (cell.isSet && cell.value != (-1).toByte())
                 res[row, col] = cell.value
         }
         return res

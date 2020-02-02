@@ -20,7 +20,7 @@ class OptionsAwareExactSolver(override val initialPuzzle: OptionsAwareSudokuPuzz
         this.printPartialSolution = printPartialSolution
     }
 
-    val queue: Queue<Triple<Int, Int, Int>> = LinkedList()
+    val queue: Queue<Triple<Int, Int, Byte>> = LinkedList()
     val numSlots = Array(initialPuzzle.size) { -1 to -1 }
 
     override fun solve(puzzle: OptionsAwareSudokuPuzzle): OptionsAwareSudokuPuzzle? {
@@ -58,7 +58,7 @@ class OptionsAwareExactSolver(override val initialPuzzle: OptionsAwareSudokuPuzz
     private fun processNumSlots() {
         for ((i, slot) in numSlots.withIndex()) {
             if (numSlots[i].first >= 0) {
-                queue.add(Triple(slot.first, slot.second, i + 1))
+                queue.add(Triple(slot.first, slot.second, (i + 1).toByte()))
             }
             numSlots[i] = -1 to -1
         }
@@ -82,7 +82,7 @@ class OptionsAwareExactSolver(override val initialPuzzle: OptionsAwareSudokuPuzz
             }
 
             val option = cell.value
-            if (option != -1 && !cell.isSet) {
+            if (option != (-1).toByte() && !cell.isSet) {
                 queue.add(Triple(row, col, option))
             }
         }

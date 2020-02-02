@@ -28,8 +28,8 @@ time and space complexity. And on top of that, I enjoyed programming them,  it w
 I decided to use two different representations of the puzzle. Since they represent the same entity, I decided to create a common abstraction [SudokuPuzzle](src/main/kotlin/io/dkozak/sudoku/model/SudokuPuzzle.kt)
 above them to share some high level operations between them.
 * [SimpleSudokuPuzzle](src/main/kotlin/io/dkozak/sudoku/model/SimpleSudokuPuzzle.kt)
-This is the most direct approach how to represent the puzzle. It uses a two dimensional integer array, where each cell either has a value from interval 1 to 9
-or -1 signalling an empty cell. Once cell needs constant amount of space -> 1 integer and there is _PuzzleSize^2_ such cells, 
+This is the most direct approach how to represent the puzzle. It uses a two dimensional byte array, where each cell either has a value from interval 1 to 9
+or -1 signalling an empty cell. Since puzzle size is 9, byte, with possible values from -128  to 127, is big enough. Once cell needs constant amount of space -> 1 byte and there is _PuzzleSize^2_ such cells, 
 therefore the total size in memory is _PuzzleSize^2_. Reads and writes take _O(1)_ time.
 * [OptionsAwareSudokuPuzzle](src/main/kotlin/io/dkozak/sudoku/model/OptionsAwareSudokuPuzzle.kt)
 When solving the puzzle, the question "Which value can be assigned to a specific cell?" has to be answered many times. Therefore, I decided to create a second 
@@ -108,3 +108,5 @@ in the default scope, which uses as many threads as there are CPU cores. However
 It solves the [Simple](src/test/resources/puzzles/first.sudoku) and [Difficult](src/test/resources/puzzles/second.sudoku) puzzles, but fails for the [Empty](src/test/resources/puzzles/empty.sudoku).
 It probably could be improved to only schedule as many tasks as there are running threads and if there are too many running tasks, use normal dfs, but this kind of search
 algorithm was beyond the scope of this task and therefore it was left as an idea for extension.
+
+- [X] Use bytes instead of ints - Original solvers used int to represent the values in the puzzles. But since the values are from interval 1 to 9, byte is big enough.

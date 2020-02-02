@@ -3,9 +3,9 @@ package io.dkozak.sudoku.model
 /**
  * Simple sudoku cell, holding only the integer value
  */
-data class SimpleSudokuCell(override var value: Int = -1) : SudokuCell {
+data class SimpleSudokuCell(override var value: Byte = -1) : SudokuCell {
     override val isEmpty: Boolean
-        get() = value == -1
+        get() = value == (-1).toByte()
 
     override fun toString(): String = if (isEmpty) " " else value.toString()
 
@@ -31,7 +31,7 @@ data class SimpleSudokuPuzzle(
 
     override val regionSize: Int = Math.sqrt(size.toDouble()).toInt()
 
-    override fun set(row: Int, col: Int, value: Int) {
+    override fun set(row: Int, col: Int, value: Byte) {
         content[row][col].value = value
     }
 

@@ -14,7 +14,7 @@ fun <PuzzleType : SudokuPuzzle<*>> loadPuzzle(path: String, puzzleFactory: (Int)
     val puzzle = puzzleFactory(puzzleSize)
     for ((i, line) in lines.withIndex())
         for ((j, cell) in line.withIndex())
-            if (cell != ' ') puzzle[i, j] = cell - '0'
+            if (cell != ' ') puzzle[i, j] = (cell - '0').toByte()
 
 
     return puzzle
