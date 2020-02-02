@@ -1,6 +1,6 @@
 package io.dkozak.sudoku.model
 
-import io.dkozak.sudoku.model.utils.isNotEmpty
+import io.dkozak.sudoku.model.utils.isFilled
 
 
 /**
@@ -55,7 +55,7 @@ internal class SudokuValidator<CellType : SudokuCell>(val puzzle: SudokuPuzzle<C
         for ((i, j, cell) in sequence) {
             if (cell.isEmpty() && !allowEmptyCells)
                 errors.add("$prefix: [$i][$j] is empty")
-            else if (cell.isNotEmpty()) {
+            else if (cell.isFilled()) {
                 numLocations.computeIfAbsent(cell.value) { mutableSetOf() }
                         .add(i to j)
             }

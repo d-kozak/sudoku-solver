@@ -1,6 +1,6 @@
 package io.dkozak.sudoku.model
 
-import io.dkozak.sudoku.model.utils.isNotEmpty
+import io.dkozak.sudoku.model.utils.isFilled
 import mu.KotlinLogging
 import java.util.*
 import kotlin.math.sqrt
@@ -35,7 +35,7 @@ class OptionsAwareSudokuCell(val size: Byte) : SudokuCell {
      * or -1, if the number of options != 1
      */
     val onlyOption: Byte
-        get() = if (isNotEmpty() && content.cardinality() == 1) (content.nextSetBit(0) + 1).toByte() else -1
+        get() = if (isEmpty() && content.cardinality() == 1) (content.nextSetBit(0) + 1).toByte() else -1
 
     /**
      * returns all assignable options in a list
@@ -103,7 +103,7 @@ class OptionsAwareSudokuPuzzle(override val content: Array<Array<OptionsAwareSud
     fun copy(): OptionsAwareSudokuPuzzle {
         val res = OptionsAwareSudokuPuzzle(size)
         for ((row, col, cell) in allCellsIndexed()) {
-            if (cell.isNotEmpty())
+            if (cell.isFilled())
                 res[row, col] = cell.value
         }
         return res

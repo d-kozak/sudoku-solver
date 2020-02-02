@@ -1,6 +1,6 @@
 package io.dkozak.sudoku.model
 
-import io.dkozak.sudoku.model.utils.isNotEmpty
+import io.dkozak.sudoku.model.utils.isFilled
 
 /**
  * Once cell in the puzzle
@@ -141,13 +141,13 @@ interface SudokuPuzzle<CellType : SudokuCell> {
     fun numbersFor(i: Int, j: Int): List<Byte> {
         val possibleNumbers = MutableList(size) { (it + 1).toByte() }
         for (cell in row(i))
-            if (cell.isNotEmpty()) possibleNumbers.remove(cell.value)
+            if (cell.isFilled()) possibleNumbers.remove(cell.value)
         for (cell in col(j)) {
-            if (cell.isNotEmpty()) possibleNumbers.remove(cell.value)
+            if (cell.isFilled()) possibleNumbers.remove(cell.value)
         }
 
         for (cell in region(i, j)) {
-            if (cell.isNotEmpty()) possibleNumbers.remove(cell.value)
+            if (cell.isFilled()) possibleNumbers.remove(cell.value)
         }
         return possibleNumbers
     }

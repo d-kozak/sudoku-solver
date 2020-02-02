@@ -2,7 +2,7 @@ package io.dkozak.sudoku.solver
 
 import io.dkozak.sudoku.model.OptionsAwareSudokuCell
 import io.dkozak.sudoku.model.OptionsAwareSudokuPuzzle
-import io.dkozak.sudoku.model.utils.isNotEmpty
+import io.dkozak.sudoku.model.utils.isFilled
 import mu.KotlinLogging
 import java.util.*
 
@@ -29,7 +29,7 @@ class OptionsAwareExactSolver(override val initialPuzzle: OptionsAwareSudokuPuzz
         while (queue.isNotEmpty()) {
             while (queue.isNotEmpty()) {
                 val (row, col, value) = queue.poll()
-                if (puzzle[row, col].isNotEmpty()) continue
+                if (puzzle[row, col].isFilled()) continue
                 puzzle[row, col] = value
             }
             scanPuzzle(puzzle)
@@ -42,7 +42,7 @@ class OptionsAwareExactSolver(override val initialPuzzle: OptionsAwareSudokuPuzz
     }
 
     private fun processCell(row: Int, col: Int, cell: OptionsAwareSudokuCell) {
-        if (cell.isNotEmpty()) return
+        if (cell.isFilled()) return
         val options = cell.allOptions()
         if (options.size == 1) {
             val option = options.first()
