@@ -16,7 +16,7 @@ gradle run --args="src/test/resources/puzzles/second.sudoku dfs"
 ```
 Arguments
 * path-to-puzzle - path to the file containing the puzzle
-* solver to use, available options are **exact**, **bfs** and **dfs**
+* solver to use, available options are **exact**, **bfs** and **dfs**. See the [architecture doc](./architecture.md) for details.
 
 
 ## Deploy

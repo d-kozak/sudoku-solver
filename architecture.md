@@ -5,7 +5,7 @@ This document contains the architecture of the solver and the decisions why it w
 Even though the original requirement was to make it in Java, I afterwards negotiated it to Kotlin/JVM. Here is my reasoning behind that decision.
 Of course, there  is no single language that is best in everything. Programming languages are just tools that developers use to solve problems.
 So each of them might be better for one thing and worse for another. However, some languages are quite similar to each other, hence they are suitable for 
-similar kinds of problems. And this is exactly the case with Java and Kotlin/JVM. And since these two languages are quite similar and 
+solving similar kinds of problems. And this is exactly the case with Java and Kotlin/JVM. And since these two languages are quite similar and 
 can be used to solve similar problems, it actually makes sense to compare them. And I find Kotlin superior to Java in many ways. Some of them are the following.
 * Better support for functional programming
 * Extension methods
@@ -18,10 +18,10 @@ can be used to solve similar problems, it actually makes sense to compare them. 
 
 ## General approach
 My approach was iterative and prototype-based. I decided to implement a very simple inefficient solver first and then gradually 
-improve it until the result was satisfying. Finally, I ended up with 4 different solving strategies using 2 different models of the puzzle.
+improve it until the result was satisfying. Finally, I ended up with 4 different solving algorithms using 2 different models of the puzzle.
 One might argue that I could probably do a deeper analysis beforehand and then go directly for the most efficient approach I could figure out (which is what I would 
 do at work if I were presented with similar task), but there was a reason why I chose my approach. I took this task as a chance to exercise 
-my programming skills, so I actually wanted to implement  multiple solutions. Also, this way I could really "feel" the different in terms of 
+my programming skills, so I actually wanted to implement  multiple solutions. Also, this way I could really "feel" the difference in terms of 
 time and space complexity. And on top of that, I enjoyed programming them,  it was fun.
   
 ##  Puzzle representation
@@ -33,7 +33,7 @@ or -1 signalling an empty cell. Once cell needs constant amount of space -> 1 in
 therefore the total size in memory is _PuzzleSize^2_. Reads and writes take _O(1)_ time.
 * [OptionsAwareSudokuPuzzle](src/main/kotlin/io/dkozak/sudoku/model/OptionsAwareSudokuPuzzle.kt)
 When solving the puzzle, the question "Which value can be assigned to a specific cell?" has to be answered many times. Therefore, I decided to create a second 
-representation, in which each cells keeps tracks of all values that can be assigned to it. Every time a value is assigned to any cell, 
+representation, in which each cells keeps track of all values that can be assigned to it. Every time a value is assigned to any cell, 
 all cells in corresponding row, col and region are updated accordingly. One might think that this representation has to consume much more space, 
 but in fact the information whether certain value can be assigned to a cell or not can be encoded in a single bit. Therefore only _PuzzleSize_ bits are needed for 
 each cell, so the memory size is still the same - _PuzzleSize^2_. However, the set operation is not constant anymore, but it has to traverse over _3*PuzzleSize_ 
@@ -69,11 +69,11 @@ was doing. It used the simple [SimpleSudokuPuzzle](src/main/kotlin/io/dkozak/sud
 the following approach. It iterated over the puzzle from left to right from top to bottom and for each cell, it computed all possible values that can be assigned to it, and iteratively tried all of them while recursively solving the remaining puzzle. 
 From a programmer's perspective, it is probably the simplest thing to do. However, this method is still very ineffective. Even though only a single model of the puzzle
 is needed if backtracking is used, this method still checks way too many paths leading to invalid states. And on top of that, even though only one model is needed, 
-the method is filling the puzzle in recursively and the depth of the recursion can be up to _PuzzleSize^2_, that is the amount of cells in the puzzle. This solver 
-failed to provide a solution even for the [Simple](src/test/resources/puzzles/first.sudoku) puzzle.
+the method is filling the puzzle in recursively and the depth of the recursion can be up to _PuzzleSize^2_, that is the maximum possible amount of empty cells in the puzzle (if all cells are empty).
+This solver failed to provide a solution even for the [Simple](src/test/resources/puzzles/first.sudoku) puzzle.
 
-The second approach I tried was to solve the puzzle in a more 'human way' -> that is in a way how a human would try to solve it. The 
-[OptionsAwareExactSolver](src/main/kotlin/io/dkozak/sudoku/solver/OptionsAwareExactSolver.kt) uses the [OptionsAwareSudokuPuzzle](src/main/kotlin/io/dkozak/sudoku/model/OptionsAwareSudokuPuzzle.kt)
+The second approach I tried was to solve the puzzle in a way human would try to solve it. The [OptionsAwareExactSolver](src/main/kotlin/io/dkozak/sudoku/solver/OptionsAwareExactSolver.kt) 
+uses the [OptionsAwareSudokuPuzzle](src/main/kotlin/io/dkozak/sudoku/model/OptionsAwareSudokuPuzzle.kt)
 model and works in the following way. It keeps filling in all cells which can have only a single value assigned to them. When it halts, the puzzle is either fully
 solved or only cells, whose value cannot be exactly determined, remain empty. This solver manages to solve the [Simple](src/test/resources/puzzles/first.sudoku) puzzle,
 however it fails for the [Difficult](src/test/resources/puzzles/second.sudoku) one, because there are not enough numbers given to make an exact decision each time.
@@ -97,14 +97,14 @@ the lowest number of options and tries all of them recursively in a depth first 
 [Difficult](src/test/resources/puzzles/second.sudoku), [Empty](src/test/resources/puzzles/empty.sudoku) and it also passes the [fuzz test](src/test/kotlin/io/dkozak/sudoku/solver/DfsFuzzTest.kt).
 
 ## Ideas for extension
--[ ] Performance measurements - Measure the execution time and memory consumption for different solvers and compare them.
+- [ ] Performance measurements - Measure the execution time and memory consumption for different solvers and compare them.
 
--[ ] More advanced search space traversals - Try to use a heuristic (maybe even random choice) to prioritize options at the decision points. 
+- [ ] More advanced search space traversals - Try to use a heuristic (maybe even random choice) to prioritize options at the decision points. 
 However, it is important to keep the cost of computing heuristic function low.
 
--[ ] Parallel solver - If there are multiple choices, try them concurrently (up to the number of cores, since this task is computational intensive). An idea was already implemented in [OptionsAwareParallelSolver](src/main/kotlin/io/dkozak/sudoku/solver/OptionsAwareParallelSolver.kt), which is very similar to 
+- [ ] Parallel solver - If there are multiple choices, try them concurrently (up to the number of cores, since this task is computational intensive). An idea was already implemented in [OptionsAwareParallelSolver](src/main/kotlin/io/dkozak/sudoku/solver/OptionsAwareParallelSolver.kt), which is very similar to 
 [OptionsAwareDfsSolver](src/main/kotlin/io/dkozak/sudoku/solver/OptionsAwareDfsSolver.kt), but it uses coroutines to make the code concurrent and it executes them
 in the default scope, which uses as many threads as there are CPU cores. However, this solver transforms the dfs traversal back to bfs, so it inherits the same problems.
 It solves the [Simple](src/test/resources/puzzles/first.sudoku) and [Difficult](src/test/resources/puzzles/second.sudoku) puzzles, but fails for the [Empty](src/test/resources/puzzles/empty.sudoku).
 It probably could be improved to only schedule as many tasks as there are running threads and if there are too many running tasks, use normal dfs, but this kind of search
-algorithm was beyong the scope of this task and therefore it was left as an idea for extension.
+algorithm was beyond the scope of this task and therefore it was left as an idea for extension.
