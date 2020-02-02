@@ -110,3 +110,13 @@ It probably could be improved to only schedule as many tasks as there are runnin
 algorithm was beyond the scope of this task and therefore it was left as an idea for extension.
 
 - [X] Use bytes instead of ints - Original solvers used int to represent the values in the puzzles. But since the values are from interval 1 to 9, byte is big enough.
+
+
+## Known issues
+1. The [OptionsAwareDfsSolver](src/main/kotlin/io/dkozak/sudoku/solver/OptionsAwareDfsSolver.kt) might still spend too much time analyzing solutions already broken puzzles, it only quits once there is a cell into
+which no value can be set without breaking some rule.
+
+2. I might have introduced a bug in the commit e1e88bbec73e2e24dd8570f0d77223505f59252b - 'refactoring, cleanup', because now the dfs solver seems to get stuck sometimes in the fuzz test,  
+which dit not happened before, but, unfortunately, I didn't manage to fully debug it. Or it might be just the manifestation of the issue 1. and the change has just increased the chances somehow, even though 
+I think that I just probably made a subtle mistake when refactoring. I could just revert it, but I believe that the refactoring was good in general and just this bug still has to be fixed. It 
+manifests only inside the fuzz test, that's why I am willing to keep it like this, while explicitly pointing it out.
